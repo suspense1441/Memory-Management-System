@@ -1,0 +1,84 @@
+INDIAN INSTITUTE OF TECHNOLOGY, KHARAGPUR
+OPERATING SYSTEMS LABORATORY
+Group Number 43
+Assignment 5 Report
+Aditya Vallakatla - 19CS30051
+Bokade Tushar Kishor - 19CS30011
+A. What is the structure of your internal page table? Why?
+STRUCTURE OF PAGETABLE
+class Page
+{
+public:
+int location; // address of the word/frame
+char varName[NAMESIZE]; // Name of the variable
+int type; // 0-char, 1-boolean, 2-median int, 3-int (based on
+their size)
+int ArrayBit; // 0-normal variable, 1-Array
+int ValidBit; // 0 - The location is free, 1 - The location is allocated
+int size; // size allocated for variable/array
+};
+B. What are additional data structures/functions used in your library?
+Describe all with justifications.
+STRUCTURE OF FUNCTION
+class Function
+{
+public:
+int funcValidBit; // 0 - Function Invalid, 1 - Function Valid
+int nextLoc; // next location for next var in symbolTable
+int offset; // Function offset inside the memory
+char symbolTableString[SYMTABLESIZE][NAMESIZE]; // Stores variable
+information
+int symbolTableInt[SYMTABLESIZE]; // Stores variable
+information
+};
+STRUCTURE OF LocationMap
+class LocationMap
+{
+public:
+int location; // location inside the allocated memory
+int idx; // index inside the page table
+};
+STRUCTURE OF MEMORY
+class Memory
+{
+public:
+void *init; // Starting Address of the Memory segment allocated
+int size; // size created using createMem (in bytes)
+int counter; // points to the next free memory space
+int nextPageLoc; // points to the next free page Table entry
+int nextFuncLoc; // points to the next free Function Table entry
+int nextMapLoc; // points to the next free location Table entry
+int usedSpace; // Space used by the user program
+Function functionTable[FUNCTABLESIZE]; // function table - stores info
+about the function and its local variables/arrays
+Page pageTable[PAGETABLESIZE]; // page table
+LocationMap locationTable[PAGETABLESIZE]; // location table - used by
+garbage collector for compacting process
+};
+C. What is the impact of mark and sweep garbage collection for demo1
+and demo2? Report the memory footprint with and without Garbage
+collection. Report the time of Garbage collection to run.
+- This Graph shows the Total Memory Consumption running demo1.cpp in two
+cases - With Garbage Collector and Without Garbage Collector.
+- This Graph shows the Total Memory Consumption running demo1.cpp where
+freeElem() reduces the memory uses in two cases - With Garbage Collector and
+Without Garbage Collector.
+- This Graph shows the Total Memory Consumption running demo2.cpp in two
+cases - With Garbage Collector and Without Garbage Collector.
+● Garbage Collector Periodicity - 10ms
+● Total RunTime for demo1.cpp with Garbage Collector - 16.823s
+● Total RunTime for demo1.cpp with Garbage Collector - 12.521s
+D. What is your logic for running compact in Garbage collection, and
+why?
+● Compaction is being done every time Garbage Collector executes gc_run().
+● Garbage Collector initially makes all the variables that are not being used
+(function exited) - invalid.
+● After sweeping, in Compaction we find the first hole in the memory and copy the
+following valid memory segment into it and loop it until the end of the valid final
+data segment, thus forming a contiguous memory segment.
+E. Did you use locks in your library? Why or why not?
+● Yes, locks played a crucial role in compaction.
+● Locks make sure that when the GC thread runs compaction and copies the data,
+the functions of the main thread don’t access the invalid/wrong data location.
+● This ensures that we are always accessing the correct memory location to get
+values and also to assign the values.
